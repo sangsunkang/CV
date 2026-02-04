@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>전기계산기 Pro - 공사방법 선택형</title>
+    <style>
+        :root { --primary: #2563eb; --bg: #f1f5f9; }
+        body { font-family: 'Pretendard', sans-serif; background: var(--bg); display: flex; justify-content: center; padding: 20px; }
+        .container { background: white; padding: 2rem; border-radius: 16px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); width: 100%; max-width: 480px; }
+        h2 { color: var(--primary); text-align: center; margin-bottom: 1.5rem; font-size: 1.5rem; }
+        .input-group { margin-bottom: 1.2rem; }
+        label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #334155; }
+        input, select { width: 100%; padding: 12px; border: 1.5px solid #e2e8f0; border-radius: 8px; box-sizing: border-box; font-size: 15px; }
+        input:focus, select:focus { border-color: var(--primary); outline: none; }
+        button { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; margin-top: 10px; }
+        .result { margin-top: 1.5rem; padding: 1.2rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; display: none; }
+        .res-item { display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px dashed #e2e8f0; padding-bottom: 5px; }
+        .highlight { color: #2563eb; font-weight: bold; }
+        .final-sq { text-align: center; margin-top: 10px; }
+        .final-sq span { font-size: 1.8rem; color: #ef4444; font-weight: 800; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>⚡ 전기계산기 Pro</h2>
+    
+    <div class="input-group">
+        <label>공사 방법 (KEC 기준)</label>
+        <select id="method">
+            <option value="B1">B1 (매입 배관, 벽면 부착)</option>
+            <option value="A1">A1 (천장 내 은폐 배관)</option>
+            <option value="C">C (노출 케이블, 트레이 등)</option>
+            <option value="E">E (공중 포설, 다심 케이블)</option>
+        </select>
+    </div>
+
+    <div class="input-group">
+        <label>부하 용량 (kW)</label>
+        <input type="number" id="power" value="20">
+    </div>
+    
+    <div class="input-group">
+        <label>전압 및 상 (V)</label>
+        <select id="voltage">
+            <option value="380">3상 380V</option>
+            <option value="220">단상 220V</option>
+        </select>
+    </div>
+
+    <div class="input-group">
+        <label>주변 온도 보정 (40℃ 기준)</label>
+        <select id="tempFactor">
+            <option value="0.91">CV 케이블 (0.91)</option>
+            <option value="1.0">상온 (1.0)</option>
+        </select>
+    </div>
+
+    <button onclick="calculate()">최적 규격 산출</button>
+
+    <div id="result" class="result">
+        <div class="res-item"><span>설계전류 (Ib)</span><span id="resIb" class="highlight"></span></div>
+        <div class="res-item"><span>추천 차단기 (In)</span><span id="resIn" class="highlight"></span></div>
+        <div class="res-item"><span>적용 허용전류 (Iz)</span><span id="resIz" class="highlight"></span></div>
+        <div class="final-sq">
+            <p style="margin-bottom: 5px; font-size: 14px;">추천 케이블 규격</p>
+            <span id="resSq"></span>
+        </div>
+    </div>
+</div>
+
+<script>
+// KEC 232.11 기준 CV(XLPE) 3심/4심 데이터
+const cableData = {
+    "A1": { 2.5: 21, 4: 28, 6: 36, 10: 49, 16: 66, 25: 86, 35: 103, 50: 125, 70: 151 },
+    "B1": { 2.5: 26, 4: 35, 6: 45, 10: 61, 16: 82, 25: 108, 35: 135, 50: 168, 70: 207 },
+    "C":  { 2.5: 31, 4: 41, 6: 53, 10: 74, 16: 99, 25: 131, 35: 162, 50: 197, 70: 246 },
+    "E":  { 2.5: 33, 4: 43, 6: 56, 10: 77, 16: 104, 25: 138, 35: 171, 50: 209, 70: 262 }
+};
+
+const mccbRatings = [15, 20, 30, 40, 50, 60, 75, 100, 125, 150, 175, 200, 225, 250, 400];
+
+function calculate() {
+    const method = document.getElementById('method').value;
+    const P = document.getElementById('power').value;
+    const V = document.getElementById('voltage').value;
+    const k = document.getElementById('tempFactor').value;
+
+    // 1. Ib 계산 (역률 0.85 가정)
+    let ib = (V == 380) ? (P * 1000) / (Math.sqrt(3) * V * 0.85) : (P * 1000) / (V * 0.85);
+    
+    // 2. In 선정
+    let in_rating = mccbRatings.find(r => r >= ib) || "별도 산정";
+
+    // 3. 케이블 선정 (공사방법 데이터 기반)
+    const currentTable = cableData[method];
+    let selectedSq = "규격 초과";
+    let finalIz = 0;
+
+    for (const [sq, amp] of Object.entries(currentTable)) {
+        let iz = amp * k;
+        if (iz >= in_rating) {
+            selectedSq = sq + " mm²";
+            finalIz = iz;
+            break;
+        }
+    }
+
+    // 결과 노출
+    document.getElementById('resIb').innerText = ib.toFixed(2) + " A";
+    document.getElementById('resIn').innerText = in_rating + " A";
+    document.getElementById('resIz').innerText = finalIz.toFixed(2) + " A";
+    document.getElementById('resSq').innerText = selectedSq;
+    document.getElementById('result').style.display = 'block';
+}
+</script>
+</body>
+</html>
