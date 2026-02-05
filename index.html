@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>전기계산기 Pro - 더블 이미지</title>
+    <title>전기계산기 Pro - 와이드 이미지</title>
     <style>
         :root { --primary: #2563eb; --bg: #f8fafc; --border: #e2e8f0; }
         body { font-family: 'Pretendard', sans-serif; background: var(--bg); margin: 0; padding: 10px; display: flex; justify-content: center; }
@@ -13,7 +13,7 @@
         .header h2 { margin: 0; font-size: 1.1rem; }
         .header p { margin: 2px 0 0; opacity: 0.8; font-size: 0.75rem; }
 
-        .content { padding: 15px; }
+        .content { padding: 15px; } /* 기본 안쪽 여백 */
         .input-group { margin-bottom: 12px; }
         label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px; color: #475569; }
         select, input { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; box-sizing: border-box; }
@@ -22,55 +22,59 @@
         .col-7 { flex: 0 0 65%; }
         .col-3 { flex: 0 0 32%; }
 
-        /* --- 사진 2장 위아래 배치 영역 --- */
+        /* --- 사진 영역: 좌우 꽉 채우기 (Edge-to-Edge) --- */
         .method-visual-container { 
-            margin-top: 8px; 
-            border: 1px solid var(--border); 
-            border-radius: 10px; 
-            overflow: hidden; 
-            display: none; /* 기본 숨김 */
+            /* 컨테이너의 패딩(15px)을 상쇄하기 위해 마이너스 마진 사용 */
+            margin-left: -15px; 
+            margin-right: -15px; 
+            width: calc(100% + 30px); 
+            margin-top: 10px;
+            margin-bottom: 15px;
+            display: none; 
         }
         .method-visual-container.active { display: block; }
 
         .img-wrapper { 
             background: white; 
-            height: 180px; /* 각 사진의 높이 */
+            height: 200px; /* 좌우가 넓어진 만큼 높이도 살짝 조정 */
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: zoom-in;
             border-bottom: 1px solid #f1f5f9;
             position: relative;
+            overflow: hidden;
         }
         .img-wrapper:last-child { border-bottom: none; }
         
         .method-img { 
-            max-width: 100%; 
-            max-height: 100%; 
-            object-fit: contain; 
+            width: 100%; /* 좌우 꽉 채우기 */
+            height: 100%;
+            object-fit: cover; /* 이미지가 영역을 가득 채우도록 설정 (중요) */
         }
 
         .img-label {
             position: absolute;
-            bottom: 5px;
-            right: 10px;
-            background: rgba(0,0,0,0.4);
+            top: 10px;
+            left: 10px;
+            background: rgba(37, 99, 235, 0.8); /* 브랜드 컬러 적용 */
             color: white;
-            font-size: 10px;
-            padding: 2px 6px;
+            font-size: 11px;
+            padding: 3px 8px;
             border-radius: 4px;
+            font-weight: bold;
         }
 
         .btn-calc { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 8px; }
 
-        /* 결과창 */
+        /* 결과 창 스타일 */
         .result-box { margin-top: 15px; background: #eff6ff; border-radius: 10px; padding: 15px; border: 1px solid #bfdbfe; display: none; }
         .result-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; border-bottom: 1px dashed #dbeafe; padding-bottom: 6px; }
         .final-sq { text-align: center; font-size: 2.2rem; font-weight: 900; color: #dc2626; margin-top: 5px; }
 
         /* 모달 팝업 */
-        #modal { display: none; position: fixed; z-index: 1000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; }
-        #modal img { max-width: 95%; max-height: 90%; border-radius: 5px; }
+        #modal { display: none; position: fixed; z-index: 1000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); justify-content: center; align-items: center; }
+        #modal img { max-width: 100%; max-height: 95%; }
     </style>
 </head>
 <body>
@@ -78,12 +82,12 @@
 <div class="container">
     <div class="header">
         <h2>⚡ 전기계산기 Pro</h2>
-        <p>공사방법별 상세 이미지 확인</p>
+        <p>KEC 현장 맞춤형 케이블 산정</p>
     </div>
     
     <div class="content">
         <div class="input-group">
-            <label>📌 공사 방법 선택</label>
+            <label>📌 공사 방법 및 현장 사진</label>
             <select id="method" onchange="updateView()">
                 <option value="B1" selected>B1 (매입 배관)</option>
                 <option value="A1">A1 (천장내 은폐)</option>
@@ -93,32 +97,28 @@
 
             <div id="group-B1" class="method-visual-container active">
                 <div class="img-wrapper" onclick="openModal('b1_1.png')">
-                    <img src="b1_1.png" class="method-img" alt="B1 도해">
-                    <span class="img-label">상세 도해</span>
+                    <img src="b1_1.png" class="method-img" alt="B1 상세">
+                    <span class="img-label">표준 도해</span>
                 </div>
                 <div class="img-wrapper" onclick="openModal('b1_2.png')">
                     <img src="b1_2.png" class="method-img" alt="B1 현장">
-                    <span class="img-label">현장 예시</span>
+                    <span class="img-label">현장 이미지</span>
                 </div>
             </div>
 
             <div id="group-A1" class="method-visual-container">
-                <div class="img-wrapper" onclick="openModal('a1_1.png')">
-                    <img src="a1_1.png" class="method-img" alt="A1 도해">
-                </div>
-                <div class="img-wrapper" onclick="openModal('a1_2.png')">
-                    <img src="a1_2.png" class="method-img" alt="A1 현장">
-                </div>
+                <div class="img-wrapper" onclick="openModal('a1_1.png')"><img src="a1_1.png" class="method-img"><span class="img-label">표준 도해</span></div>
+                <div class="img-wrapper" onclick="openModal('a1_2.png')"><img src="a1_2.png" class="method-img"><span class="img-label">현장 이미지</span></div>
             </div>
-
+            
             <div id="group-C" class="method-visual-container">
-                <div class="img-wrapper" onclick="openModal('c_1.png')"><img src="c_1.png" class="method-img"></div>
-                <div class="img-wrapper" onclick="openModal('c_2.png')"><img src="c_2.png" class="method-img"></div>
+                <div class="img-wrapper" onclick="openModal('c_1.png')"><img src="c_1.png" class="method-img"><span class="img-label">표준 도해</span></div>
+                <div class="img-wrapper" onclick="openModal('c_2.png')"><img src="c_2.png" class="method-img"><span class="img-label">현장 이미지</span></div>
             </div>
 
             <div id="group-E" class="method-visual-container">
-                <div class="img-wrapper" onclick="openModal('e_1.png')"><img src="e_1.png" class="method-img"></div>
-                <div class="img-wrapper" onclick="openModal('e_2.png')"><img src="e_2.png" class="method-img"></div>
+                <div class="img-wrapper" onclick="openModal('e_1.png')"><img src="e_1.png" class="method-img"><span class="img-label">표준 도해</span></div>
+                <div class="img-wrapper" onclick="openModal('e_2.png')"><img src="e_2.png" class="method-img"><span class="img-label">현장 이미지</span></div>
             </div>
         </div>
 
@@ -135,8 +135,8 @@
         <button class="btn-calc" onclick="calculate()">규격 산출하기</button>
 
         <div id="result" class="result-box">
-            <div class="result-row"><span>설계전류 (Ib)</span><span id="resIb"></span></div>
-            <div class="result-row"><span>차단기 정격 (In)</span><span id="resIn"></span></div>
+            <div class="result-row"><span>설계전류 ($I_B$)</span><span id="resIb"></span></div>
+            <div class="result-row"><span>차단기 정격 ($I_n$)</span><span id="resIn" style="color:var(--primary); font-weight:bold;"></span></div>
             <div class="final-sq" id="resSq"></div>
         </div>
     </div>
@@ -145,14 +145,12 @@
 <div id="modal" onclick="closeModal()"><img id="modal-img" src=""></div>
 
 <script>
-// 사진 그룹 전환 함수
 function updateView() {
     const val = document.getElementById('method').value;
     document.querySelectorAll('.method-visual-container').forEach(el => el.classList.remove('active'));
     document.getElementById('group-' + val).classList.add('active');
 }
 
-// 팝업 확대 함수
 function openModal(src) {
     const modal = document.getElementById('modal');
     document.getElementById('modal-img').src = src;
@@ -160,7 +158,6 @@ function openModal(src) {
 }
 function closeModal() { document.getElementById('modal').style.display = 'none'; }
 
-// 계산 로직 (기존과 동일)
 const cableData = {
     "A1": { 2.5: 21, 4: 28, 6: 36, 10: 49, 16: 66, 25: 86, 35: 103, 50: 125 },
     "B1": { 2.5: 26, 4: 35, 6: 45, 10: 61, 16: 82, 25: 108, 35: 135, 50: 168 },
