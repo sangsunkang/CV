@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>전기계산기 Pro - 전압강하 통합본</title>
+    <title>전기계산기 Pro - 프리미엄 통합본</title>
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
     <style>
         :root {
             --primary: #3b82f6; --primary-glow: rgba(59, 130, 246, 0.4);
             --accent: #60a5fa; --bg-dark: #020617;
-            --card-bg: rgba(15, 23, 42, 0.8); --input-bg: #1e293b;
+            --card-bg: rgba(15, 23, 42, 0.9); --input-bg: #1e293b;
             --border: #334155; --text-main: #f8fafc; --text-muted: #94a3b8;
         }
 
@@ -25,27 +25,29 @@
             border-radius: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); overflow: hidden;
         }
 
-        .header { padding: 24px 20px; text-align: center; border-bottom: 1px solid var(--border); }
-        .header h2 { 
-            margin: 0; font-size: 1.25rem; font-weight: 800;
-            background: linear-gradient(to right, #60a5fa, #a855f7);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        }
+        .header { padding: 20px; text-align: center; border-bottom: 1px solid var(--border); }
+        .header h2 { margin: 0; font-size: 1.2rem; font-weight: 800; color: var(--accent); letter-spacing: 1px; }
+        .header p { margin: 4px 0 0; font-size: 0.75rem; color: var(--text-muted); }
 
         .content { padding: 20px; }
         .section-card { background: rgba(30, 41, 59, 0.5); border: 1px solid var(--border); border-radius: 16px; padding: 16px; margin-bottom: 20px; }
         
-        label { display: block; font-size: 0.75rem; font-weight: 700; margin-bottom: 8px; color: var(--accent); text-transform: uppercase; }
+        label { display: block; font-size: 0.75rem; font-weight: 700; margin-bottom: 8px; color: var(--accent); }
         select, input { 
             width: 100%; padding: 12px; background: var(--input-bg); 
             border: 1px solid var(--border); border-radius: 10px; color: white; font-size: 0.95rem; box-sizing: border-box;
         }
 
-        /* 이미지 영역 */
+        /* --- 이미지 영역 최적화 (양옆 꽉 채움, 안 잘림) --- */
         .visual-box { margin: 10px -16px -16px -16px; border-top: 1px solid var(--border); display: none; }
         .visual-box.active { display: block; }
-        .img-wrap { height: 160px; display: flex; align-items: center; justify-content: center; cursor: zoom-in; position: relative; background: #000; }
-        .method-img { width: 100%; height: 100%; object-fit: contain; }
+        .img-wrap { 
+            height: 200px; display: flex; align-items: center; justify-content: center; 
+            cursor: zoom-in; position: relative; background: #000; 
+        }
+        .img-wrap:first-child { border-bottom: 1px solid #1e293b; }
+        .method-img { width: 100%; height: 100%; object-fit: contain; } /* 사진 안 잘리게 */
+        .badge { position: absolute; top: 12px; left: 12px; background: var(--primary); color: white; font-size: 10px; padding: 4px 8px; border-radius: 6px; font-weight: bold; }
 
         .btn-calc { 
             width: 100%; padding: 18px; background: linear-gradient(135deg, #3b82f6, #2563eb);
@@ -65,6 +67,7 @@
         .stat-value { font-size: 1.1rem; font-weight: 700; }
         .hero-sq { font-size: 2.8rem; font-weight: 900; color: #f87171; text-align: center; margin: 10px 0; text-shadow: 0 0 15px rgba(248,113,113,0.3); }
 
+        /* 팝업 모달 */
         #modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); justify-content: center; align-items: center; }
         #modal img { max-width: 100%; max-height: 90%; object-fit: contain; }
     </style>
@@ -74,26 +77,39 @@
 <div class="container">
     <div class="header">
         <h2>PREMIUM ELECTRIC PRO</h2>
-        <p>KEC 허용전류 & 전압강하 통합 선정</p>
+        <p>허용전류 & 전압강하 통합 산정 시스템</p>
     </div>
     
     <div class="content">
         <div class="section-card">
-            <label>📍 공사 방법</label>
+            <label>📍 공사 방법 (KEC 기준)</label>
             <select id="method" onchange="updateView()">
                 <option value="B1" selected>B1 (매입 배관)</option>
                 <option value="A1">A1 (천장내 은폐)</option>
                 <option value="C">C (트레이 / 노출)</option>
                 <option value="E">E (공중 포설)</option>
             </select>
+
             <div id="group-B1" class="visual-box active">
-                <div class="img-wrap" onclick="openModal('b1_1.png')"><img src="b1_1.png" class="method-img"></div>
-                <div class="img-wrap" onclick="openModal('b1_2.png')"><img src="b1_2.png" class="method-img"></div>
+                <div class="img-wrap" onclick="openModal('b1_1.png')"><img src="b1_1.png" class="method-img"><span class="badge">도식</span></div>
+                <div class="img-wrap" onclick="openModal('b1_2.png')"><img src="b1_2.png" class="method-img"><span class="badge">현장</span></div>
             </div>
+            <div id="group-A1" class="visual-box">
+                <div class="img-wrap" onclick="openModal('a1_1.png')"><img src="a1_1.png" class="method-img"><span class="badge">도식</span></div>
+                <div class="img-wrap" onclick="openModal('a1_2.png')"><img src="a1_2.png" class="method-img"><span class="badge">현장</span></div>
             </div>
+            <div id="group-C" class="visual-box">
+                <div class="img-wrap" onclick="openModal('c_1.png')"><img src="c_1.png" class="method-img"><span class="badge">도식</span></div>
+                <div class="img-wrap" onclick="openModal('c_2.png')"><img src="c_2.png" class="method-img"><span class="badge">현장</span></div>
+            </div>
+            <div id="group-E" class="visual-box">
+                <div class="img-wrap" onclick="openModal('e_1.png')"><img src="e_1.png" class="method-img"><span class="badge">도식</span></div>
+                <div class="img-wrap" onclick="openModal('e_2.png')"><img src="e_2.png" class="method-img"><span class="badge">현장</span></div>
+            </div>
+        </div>
 
         <div class="section-card">
-            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <div style="display: flex; gap: 10px; margin-bottom: 12px;">
                 <div style="flex: 1;">
                     <label>🌡️ 주위 온도</label>
                     <select id="temp">
@@ -135,7 +151,7 @@
             </div>
         </div>
 
-        <button class="btn-calc" onclick="calculate()">통합 규격 산출</button>
+        <button class="btn-calc" onclick="calculate()">통합 규격 계산 실행</button>
 
         <div id="result" class="result-dashboard">
             <div class="stat-grid">
@@ -149,9 +165,9 @@
                 </div>
             </div>
             <div style="text-align: center; border-top: 1px solid var(--border); padding-top: 15px;">
-                <span id="resMsg" style="font-size: 0.7rem; color: var(--accent); font-weight: bold;">최종 선정 규격</span>
+                <span style="font-size: 0.8rem; color: var(--accent); font-weight: bold;">최종 선정 전선 규격</span>
                 <div class="hero-sq" id="resSq">-- SQ</div>
-                <p style="margin:0; font-size:0.7rem; color:var(--text-muted);">차단기 <span id="resIn">0</span>A | 허용전류 만족 여부 확인됨</p>
+                <p style="margin:0; font-size:0.7rem; color:var(--text-muted);">차단기 정격: <span id="resIn">0</span>A 적용</p>
             </div>
         </div>
     </div>
@@ -185,20 +201,16 @@ function calculate() {
     const L = parseFloat(document.getElementById('length').value);
     const dropLimit = parseFloat(document.getElementById('vdrop_limit').value);
     
-    // 1. Ib 계산
     let ib = (V === 380) ? (P * 1000) / (Math.sqrt(3) * V * pf) : (P * 1000) / (V * pf);
-    let in_rating = mccb.find(r => r >= ib) || "별도산정";
+    let in_rating = mccb.find(r => r >= ib) || "산정불가";
     
-    // 2. 케이블 로직 (허용전류 & 전압강하 동시 만족 찾기)
     let selectedSq = null;
     let finalDrop = 0;
     const currentTable = cableData[method];
     
     for (const [sq, amp] of Object.entries(currentTable)) {
         let iz = amp * kt;
-        // 조건 A: 허용전류 만족 (In <= Iz)
         if (iz >= in_rating) {
-            // 조건 B: 전압강하 만족 체크
             let factor = (V === 380) ? 17.8 : 35.6;
             let voltageDropV = (factor * L * ib) / (1000 * parseFloat(sq));
             let dropPercent = (voltageDropV / V) * 100;
