@@ -8,39 +8,88 @@
         :root { --primary: #2563eb; --bg: #f8fafc; --border: #e2e8f0; }
         body { font-family: 'Pretendard', sans-serif; background: var(--bg); margin: 0; padding: 10px; display: flex; justify-content: center; }
         
-        /* 전체 컨테이너 폭 축소 (400px) */
-        .container { background: white; width: 100%; max-width: 380px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); overflow: hidden; }
+        /* 전체 컨테이너 */
+        .container { background: white; width: 100%; max-width: 400px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); overflow: hidden; }
         
-        /* 헤더 크기 축소 */
         .header { background: var(--primary); color: white; padding: 12px; text-align: center; }
         .header h2 { margin: 0; font-size: 1.1rem; }
         .header p { margin: 2px 0 0; opacity: 0.8; font-size: 0.75rem; }
 
         .content { padding: 15px; }
 
-        /* 입력 그룹 레이아웃 */
         .input-group { margin-bottom: 12px; }
         label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px; color: #475569; }
         select, input { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; box-sizing: border-box; }
         
-        /* 용량/역률 나란히 배치 (넘침 방지) */
         .row { display: flex; gap: 8px; }
         .col-7 { flex: 0 0 65%; }
         .col-3 { flex: 0 0 32%; }
 
-        /* 이미지 영역 최적화 */
-        .method-visual { margin-top: 8px; border-radius: 10px; background: #f1f5f9; border: 1px solid var(--border); height: 140px; display: flex; flex-direction: column; overflow: hidden; }
-        .method-img { width: 100%; height: 110px; object-fit: cover; display: none; }
+        /* 이미지 영역 */
+        .method-visual { 
+            margin-top: 8px; 
+            border-radius: 10px; 
+            background: white; 
+            border: 1px solid var(--border); 
+            height: 260px; 
+            display: flex; 
+            flex-direction: column; 
+            overflow: hidden; 
+            cursor: zoom-in; /* 클릭 가능함을 표시 */
+            position: relative;
+        }
+        .method-img { 
+            width: 100%; 
+            height: 230px; 
+            object-fit: contain; 
+            display: none; 
+            background: #fff;
+        }
         .method-img.active { display: block; }
-        .img-caption { font-size: 11px; color: #64748b; text-align: center; padding: 4px; background: white; }
+        .img-caption { 
+            font-size: 11px; 
+            color: #2563eb; 
+            text-align: center; 
+            padding: 6px; 
+            background: #f1f5f9; 
+            font-weight: bold;
+            border-top: 1px solid var(--border);
+        }
+        /* 줌 안내 뱃지 */
+        .zoom-badge { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.5); color: white; font-size: 10px; padding: 3px 6px; border-radius: 4px; pointer-events: none; }
 
-        .btn-calc { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 5px; }
+        .btn-calc { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 8px; }
 
-        /* 결과 창 슬림화 */
-        .result-box { margin-top: 15px; background: #eff6ff; border-radius: 10px; padding: 12px; border: 1px solid #bfdbfe; display: none; }
-        .result-row { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 13px; border-bottom: 1px dashed #dbeafe; padding-bottom: 4px; }
+        .result-box { margin-top: 15px; background: #eff6ff; border-radius: 10px; padding: 15px; border: 1px solid #bfdbfe; display: none; }
+        .result-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; border-bottom: 1px dashed #dbeafe; padding-bottom: 6px; }
         .final-result { text-align: center; margin-top: 10px; }
-        .final-sq { font-size: 1.8rem; font-weight: 800; color: #dc2626; margin: 5px 0; }
+        .final-sq { font-size: 2.2rem; font-weight: 900; color: #dc2626; margin: 5px 0; }
+
+        /* --- 팝업(모달) 스타일 추가 --- */
+        #modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.9);
+            justify-content: center;
+            align-items: center;
+        }
+        #modal img {
+            max-width: 95%;
+            max-height: 85%;
+            box-shadow: 0 0 20px rgba(255,255,255,0.2);
+            border-radius: 5px;
+        }
+        #modal-close {
+            position: absolute;
+            top: 30px; right: 30px;
+            color: white;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -48,35 +97,37 @@
 <div class="container">
     <div class="header">
         <h2>⚡ 전기계산기 Pro</h2>
-        <p>KEC 최신 규격 반영</p>
+        <p>KEC 공사방법별 케이블 산정</p>
     </div>
     
     <div class="content">
         <div class="input-group">
-            <label>📌 공사 방법 선택</label>
+            <label>📌 공사 방법 (클릭 시 이미지 확대)</label>
             <select id="method" onchange="showMethodImage()">
-                <option value="B1">B1 (매입 배관)</option>
+                <option value="B1" selected>B1 (매입 배관)</option>
                 <option value="A1">A1 (천장내 은폐)</option>
-                <option value="C" selected>C (트레이/노출)</option>
+                <option value="C">C (트레이 / 노출)</option>
                 <option value="E">E (공중 포설)</option>
             </select>
-            <div class="method-visual">
-                <img id="img-B1" src="https://placehold.co/400x200/e2e8f0/475569?text=B1+Diagram" class="method-img">
-                <img id="img-A1" src="https://placehold.co/400x200/e2e8f0/475569?text=A1+Diagram" class="method-img">
-                <img id="img-C" src="https://placehold.co/400x200/e2e8f0/475569?text=C+Diagram" class="method-img active">
-                <img id="img-E" src="https://placehold.co/400x200/e2e8f0/475569?text=E+Diagram" class="method-img">
-                <div class="img-caption">설치 환경 예시 이미지</div>
+            
+            <div class="method-visual" onclick="openModal()">
+                <div class="zoom-badge">🔍 확대</div>
+                <img id="img-B1" src="b1.png" class="method-img active" alt="B1">
+                <img id="img-A1" src="a1.png" class="method-img" alt="A1">
+                <img id="img-C" src="c.png" class="method-img" alt="C">
+                <img id="img-E" src="e.png" class="method-img" alt="E">
+                <div class="img-caption" id="method-title">B1: 매입 배관 방식</div>
             </div>
         </div>
 
         <div class="row input-group">
             <div class="col-7">
                 <label>부하 용량 (kW)</label>
-                <input type="number" id="power" value="20">
+                <input type="number" id="power" value="30">
             </div>
             <div class="col-3">
                 <label>역률</label>
-                <input type="number" id="pf" value="0.85" step="0.05">
+                <input type="number" id="pf" value="0.85" step="0.01">
             </div>
         </div>
         
@@ -88,33 +139,60 @@
             </select>
         </div>
 
-        <button class="btn-calc" onclick="calculate()">계산하기</button>
+        <button class="btn-calc" onclick="calculate()">규격 산출하기</button>
 
         <div id="result" class="result-box">
             <div class="result-row"><span>설계전류 (Ib)</span><span id="resIb"></span></div>
-            <div class="result-row"><span>차단기 (In)</span><span id="resIn"></span></div>
+            <div class="result-row"><span>차단기 정격 (In)</span><span id="resIn" style="color:var(--primary); font-weight:bold;"></span></div>
             <div class="final-result">
-                <p style="margin:0; font-size:12px;">추천 CV 규격</p>
+                <p style="margin:0; font-size:13px; color:#64748b;">추천 CV 케이블 굵기</p>
                 <div class="final-sq" id="resSq"></div>
             </div>
         </div>
     </div>
 </div>
 
+<div id="modal" onclick="closeModal()">
+    <span id="modal-close">&times;</span>
+    <img id="modal-img" src="" alt="확대 이미지">
+</div>
+
 <script>
-function showMethodImage() {
-    const val = document.getElementById('method').value;
-    document.querySelectorAll('.method-img').forEach(img => img.classList.remove('active'));
-    document.getElementById('img-' + val).classList.add('active');
+// --- 1. 모달(팝업) 관련 함수 ---
+function openModal() {
+    const activeImg = document.querySelector('.method-img.active');
+    const modal = document.getElementById('modal');
+    const modalImg = document.getElementById('modal-img');
+    
+    modalImg.src = activeImg.src; // 현재 보이는 이미지의 경로를 팝업 이미지에 대입
+    modal.style.display = 'flex'; // 모달 보이기
 }
 
+function closeModal() {
+    document.getElementById('modal').style.display = 'none'; // 모달 숨기기
+}
+
+// --- 2. 이미지 전환 함수 ---
+function showMethodImage() {
+    const sel = document.getElementById('method');
+    const val = sel.value;
+    const text = sel.options[sel.selectedIndex].text;
+    
+    document.querySelectorAll('.method-img').forEach(img => img.classList.remove('active'));
+    const targetImg = document.getElementById('img-' + val);
+    if(targetImg) targetImg.classList.add('active');
+    
+    document.getElementById('method-title').innerText = text;
+}
+
+// --- 3. 계산 로직 ---
 const cableData = {
-    "A1": { 2.5: 21, 4: 28, 6: 36, 10: 49, 16: 66, 25: 86 },
-    "B1": { 2.5: 26, 4: 35, 6: 45, 10: 61, 16: 82, 25: 108 },
-    "C":  { 2.5: 31, 4: 41, 6: 53, 10: 74, 16: 99, 25: 131 },
-    "E":  { 2.5: 33, 4: 43, 6: 56, 10: 77, 16: 104, 25: 138 }
+    "A1": { 2.5: 21, 4: 28, 6: 36, 10: 49, 16: 66, 25: 86, 35: 103, 50: 125 },
+    "B1": { 2.5: 26, 4: 35, 6: 45, 10: 61, 16: 82, 25: 108, 35: 135, 50: 168 },
+    "C":  { 2.5: 31, 4: 41, 6: 53, 10: 74, 16: 99, 25: 131, 35: 162, 50: 197 },
+    "E":  { 2.5: 33, 4: 43, 6: 56, 10: 77, 16: 104, 25: 138, 35: 171, 50: 209 }
 };
-const mccb = [15, 20, 30, 40, 50, 60, 75, 100, 125, 150, 175, 200];
+const mccb = [15, 20, 30, 40, 50, 60, 75, 100, 125, 150, 175, 200, 225, 250];
 
 function calculate() {
     const method = document.getElementById('method').value;
@@ -123,10 +201,11 @@ function calculate() {
     const pf = parseFloat(document.getElementById('pf').value);
     
     let ib = (V === 380) ? (P * 1000) / (Math.sqrt(3) * V * pf) : (P * 1000) / (V * pf);
-    let in_rating = mccb.find(r => r >= ib);
+    let in_rating = mccb.find(r => r >= ib) || "별도 산정";
     
-    let selectedSq = "초과";
-    for (const [sq, amp] of Object.entries(cableData[method])) {
+    let selectedSq = "규격 초과";
+    const currentTable = cableData[method];
+    for (const [sq, amp] of Object.entries(currentTable)) {
         if (amp * 0.91 >= in_rating) {
             selectedSq = sq + " SQ";
             break;
