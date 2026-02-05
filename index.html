@@ -3,20 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>전기계산기 Pro</title>
+    <title>전기계산기 Pro - 더블 이미지</title>
     <style>
         :root { --primary: #2563eb; --bg: #f8fafc; --border: #e2e8f0; }
         body { font-family: 'Pretendard', sans-serif; background: var(--bg); margin: 0; padding: 10px; display: flex; justify-content: center; }
         
-        /* 전체 컨테이너 */
         .container { background: white; width: 100%; max-width: 400px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); overflow: hidden; }
-        
         .header { background: var(--primary); color: white; padding: 12px; text-align: center; }
         .header h2 { margin: 0; font-size: 1.1rem; }
         .header p { margin: 2px 0 0; opacity: 0.8; font-size: 0.75rem; }
 
         .content { padding: 15px; }
-
         .input-group { margin-bottom: 12px; }
         label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px; color: #475569; }
         select, input { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; box-sizing: border-box; }
@@ -25,71 +22,55 @@
         .col-7 { flex: 0 0 65%; }
         .col-3 { flex: 0 0 32%; }
 
-        /* 이미지 영역 */
-        .method-visual { 
+        /* --- 사진 2장 위아래 배치 영역 --- */
+        .method-visual-container { 
             margin-top: 8px; 
-            border-radius: 10px; 
-            background: white; 
             border: 1px solid var(--border); 
-            height: 260px; 
-            display: flex; 
-            flex-direction: column; 
+            border-radius: 10px; 
             overflow: hidden; 
-            cursor: zoom-in; /* 클릭 가능함을 표시 */
+            display: none; /* 기본 숨김 */
+        }
+        .method-visual-container.active { display: block; }
+
+        .img-wrapper { 
+            background: white; 
+            height: 180px; /* 각 사진의 높이 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: zoom-in;
+            border-bottom: 1px solid #f1f5f9;
             position: relative;
         }
+        .img-wrapper:last-child { border-bottom: none; }
+        
         .method-img { 
-            width: 100%; 
-            height: 230px; 
+            max-width: 100%; 
+            max-height: 100%; 
             object-fit: contain; 
-            display: none; 
-            background: #fff;
         }
-        .method-img.active { display: block; }
-        .img-caption { 
-            font-size: 11px; 
-            color: #2563eb; 
-            text-align: center; 
-            padding: 6px; 
-            background: #f1f5f9; 
-            font-weight: bold;
-            border-top: 1px solid var(--border);
+
+        .img-label {
+            position: absolute;
+            bottom: 5px;
+            right: 10px;
+            background: rgba(0,0,0,0.4);
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
         }
-        /* 줌 안내 뱃지 */
-        .zoom-badge { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.5); color: white; font-size: 10px; padding: 3px 6px; border-radius: 4px; pointer-events: none; }
 
         .btn-calc { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 8px; }
 
+        /* 결과창 */
         .result-box { margin-top: 15px; background: #eff6ff; border-radius: 10px; padding: 15px; border: 1px solid #bfdbfe; display: none; }
         .result-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; border-bottom: 1px dashed #dbeafe; padding-bottom: 6px; }
-        .final-result { text-align: center; margin-top: 10px; }
-        .final-sq { font-size: 2.2rem; font-weight: 900; color: #dc2626; margin: 5px 0; }
+        .final-sq { text-align: center; font-size: 2.2rem; font-weight: 900; color: #dc2626; margin-top: 5px; }
 
-        /* --- 팝업(모달) 스타일 추가 --- */
-        #modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background-color: rgba(0,0,0,0.9);
-            justify-content: center;
-            align-items: center;
-        }
-        #modal img {
-            max-width: 95%;
-            max-height: 85%;
-            box-shadow: 0 0 20px rgba(255,255,255,0.2);
-            border-radius: 5px;
-        }
-        #modal-close {
-            position: absolute;
-            top: 30px; right: 30px;
-            color: white;
-            font-size: 40px;
-            font-weight: bold;
-            cursor: pointer;
-        }
+        /* 모달 팝업 */
+        #modal { display: none; position: fixed; z-index: 1000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; }
+        #modal img { max-width: 95%; max-height: 90%; border-radius: 5px; }
     </style>
 </head>
 <body>
@@ -97,95 +78,89 @@
 <div class="container">
     <div class="header">
         <h2>⚡ 전기계산기 Pro</h2>
-        <p>KEC 공사방법별 케이블 산정</p>
+        <p>공사방법별 상세 이미지 확인</p>
     </div>
     
     <div class="content">
         <div class="input-group">
-            <label>📌 공사 방법 (클릭 시 이미지 확대)</label>
-            <select id="method" onchange="showMethodImage()">
+            <label>📌 공사 방법 선택</label>
+            <select id="method" onchange="updateView()">
                 <option value="B1" selected>B1 (매입 배관)</option>
                 <option value="A1">A1 (천장내 은폐)</option>
                 <option value="C">C (트레이 / 노출)</option>
                 <option value="E">E (공중 포설)</option>
             </select>
-            
-            <div class="method-visual" onclick="openModal()">
-                <div class="zoom-badge">🔍 확대</div>
-                <img id="img-B1" src="b1.png" class="method-img active" alt="B1">
-                <img id="img-A1" src="a1.png" class="method-img" alt="A1">
-                <img id="img-C" src="c.png" class="method-img" alt="C">
-                <img id="img-E" src="e.png" class="method-img" alt="E">
-                <div class="img-caption" id="method-title">B1: 매입 배관 방식</div>
+
+            <div id="group-B1" class="method-visual-container active">
+                <div class="img-wrapper" onclick="openModal('b1_1.png')">
+                    <img src="b1_1.png" class="method-img" alt="B1 도해">
+                    <span class="img-label">상세 도해</span>
+                </div>
+                <div class="img-wrapper" onclick="openModal('b1_2.png')">
+                    <img src="b1_2.png" class="method-img" alt="B1 현장">
+                    <span class="img-label">현장 예시</span>
+                </div>
+            </div>
+
+            <div id="group-A1" class="method-visual-container">
+                <div class="img-wrapper" onclick="openModal('a1_1.png')">
+                    <img src="a1_1.png" class="method-img" alt="A1 도해">
+                </div>
+                <div class="img-wrapper" onclick="openModal('a1_2.png')">
+                    <img src="a1_2.png" class="method-img" alt="A1 현장">
+                </div>
+            </div>
+
+            <div id="group-C" class="method-visual-container">
+                <div class="img-wrapper" onclick="openModal('c_1.png')"><img src="c_1.png" class="method-img"></div>
+                <div class="img-wrapper" onclick="openModal('c_2.png')"><img src="c_2.png" class="method-img"></div>
+            </div>
+
+            <div id="group-E" class="method-visual-container">
+                <div class="img-wrapper" onclick="openModal('e_1.png')"><img src="e_1.png" class="method-img"></div>
+                <div class="img-wrapper" onclick="openModal('e_2.png')"><img src="e_2.png" class="method-img"></div>
             </div>
         </div>
 
         <div class="row input-group">
-            <div class="col-7">
-                <label>부하 용량 (kW)</label>
-                <input type="number" id="power" value="30">
-            </div>
-            <div class="col-3">
-                <label>역률</label>
-                <input type="number" id="pf" value="0.85" step="0.01">
-            </div>
+            <div class="col-7"><label>부하 용량 (kW)</label><input type="number" id="power" value="30"></div>
+            <div class="col-3"><label>역률</label><input type="number" id="pf" value="0.85" step="0.01"></div>
         </div>
         
         <div class="input-group">
             <label>전압 (V)</label>
-            <select id="voltage">
-                <option value="380">3상 380V</option>
-                <option value="220">단상 220V</option>
-            </select>
+            <select id="voltage"><option value="380">3상 380V</option><option value="220">단상 220V</option></select>
         </div>
 
         <button class="btn-calc" onclick="calculate()">규격 산출하기</button>
 
         <div id="result" class="result-box">
             <div class="result-row"><span>설계전류 (Ib)</span><span id="resIb"></span></div>
-            <div class="result-row"><span>차단기 정격 (In)</span><span id="resIn" style="color:var(--primary); font-weight:bold;"></span></div>
-            <div class="final-result">
-                <p style="margin:0; font-size:13px; color:#64748b;">추천 CV 케이블 굵기</p>
-                <div class="final-sq" id="resSq"></div>
-            </div>
+            <div class="result-row"><span>차단기 정격 (In)</span><span id="resIn"></span></div>
+            <div class="final-sq" id="resSq"></div>
         </div>
     </div>
 </div>
 
-<div id="modal" onclick="closeModal()">
-    <span id="modal-close">&times;</span>
-    <img id="modal-img" src="" alt="확대 이미지">
-</div>
+<div id="modal" onclick="closeModal()"><img id="modal-img" src=""></div>
 
 <script>
-// --- 1. 모달(팝업) 관련 함수 ---
-function openModal() {
-    const activeImg = document.querySelector('.method-img.active');
+// 사진 그룹 전환 함수
+function updateView() {
+    const val = document.getElementById('method').value;
+    document.querySelectorAll('.method-visual-container').forEach(el => el.classList.remove('active'));
+    document.getElementById('group-' + val).classList.add('active');
+}
+
+// 팝업 확대 함수
+function openModal(src) {
     const modal = document.getElementById('modal');
-    const modalImg = document.getElementById('modal-img');
-    
-    modalImg.src = activeImg.src; // 현재 보이는 이미지의 경로를 팝업 이미지에 대입
-    modal.style.display = 'flex'; // 모달 보이기
+    document.getElementById('modal-img').src = src;
+    modal.style.display = 'flex';
 }
+function closeModal() { document.getElementById('modal').style.display = 'none'; }
 
-function closeModal() {
-    document.getElementById('modal').style.display = 'none'; // 모달 숨기기
-}
-
-// --- 2. 이미지 전환 함수 ---
-function showMethodImage() {
-    const sel = document.getElementById('method');
-    const val = sel.value;
-    const text = sel.options[sel.selectedIndex].text;
-    
-    document.querySelectorAll('.method-img').forEach(img => img.classList.remove('active'));
-    const targetImg = document.getElementById('img-' + val);
-    if(targetImg) targetImg.classList.add('active');
-    
-    document.getElementById('method-title').innerText = text;
-}
-
-// --- 3. 계산 로직 ---
+// 계산 로직 (기존과 동일)
 const cableData = {
     "A1": { 2.5: 21, 4: 28, 6: 36, 10: 49, 16: 66, 25: 86, 35: 103, 50: 125 },
     "B1": { 2.5: 26, 4: 35, 6: 45, 10: 61, 16: 82, 25: 108, 35: 135, 50: 168 },
@@ -199,19 +174,12 @@ function calculate() {
     const P = parseFloat(document.getElementById('power').value);
     const V = parseInt(document.getElementById('voltage').value);
     const pf = parseFloat(document.getElementById('pf').value);
-    
     let ib = (V === 380) ? (P * 1000) / (Math.sqrt(3) * V * pf) : (P * 1000) / (V * pf);
     let in_rating = mccb.find(r => r >= ib) || "별도 산정";
-    
     let selectedSq = "규격 초과";
-    const currentTable = cableData[method];
-    for (const [sq, amp] of Object.entries(currentTable)) {
-        if (amp * 0.91 >= in_rating) {
-            selectedSq = sq + " SQ";
-            break;
-        }
+    for (const [sq, amp] of Object.entries(cableData[method])) {
+        if (amp * 0.91 >= in_rating) { selectedSq = sq + " SQ"; break; }
     }
-
     document.getElementById('resIb').innerText = ib.toFixed(1) + " A";
     document.getElementById('resIn').innerText = in_rating + " A";
     document.getElementById('resSq').innerText = selectedSq;
