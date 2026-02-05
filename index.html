@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>전기계산기 Pro - 와이드 이미지</title>
+    <title>전기계산기 Pro - 와이드 & 전체보기</title>
     <style>
         :root { --primary: #2563eb; --bg: #f8fafc; --border: #e2e8f0; }
         body { font-family: 'Pretendard', sans-serif; background: var(--bg); margin: 0; padding: 10px; display: flex; justify-content: center; }
@@ -13,7 +13,7 @@
         .header h2 { margin: 0; font-size: 1.1rem; }
         .header p { margin: 2px 0 0; opacity: 0.8; font-size: 0.75rem; }
 
-        .content { padding: 15px; } /* 기본 안쪽 여백 */
+        .content { padding: 15px; }
         .input-group { margin-bottom: 12px; }
         label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px; color: #475569; }
         select, input { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; box-sizing: border-box; }
@@ -24,57 +24,58 @@
 
         /* --- 사진 영역: 좌우 꽉 채우기 (Edge-to-Edge) --- */
         .method-visual-container { 
-            /* 컨테이너의 패딩(15px)을 상쇄하기 위해 마이너스 마진 사용 */
-            margin-left: -15px; 
+            margin-left: -15px; /* 부모 패딩 상쇄하여 꽉 채움 */
             margin-right: -15px; 
             width: calc(100% + 30px); 
             margin-top: 10px;
             margin-bottom: 15px;
             display: none; 
+            border-top: 1px solid #f1f5f9;
+            border-bottom: 1px solid #f1f5f9;
         }
         .method-visual-container.active { display: block; }
 
         .img-wrapper { 
-            background: white; 
-            height: 200px; /* 좌우가 넓어진 만큼 높이도 살짝 조정 */
+            background: #ffffff; /* 사진 비율이 안 맞을 때 보일 배경색 */
+            height: 220px; /* 높이를 조금 더 여유있게 확보 */
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: zoom-in;
-            border-bottom: 1px solid #f1f5f9;
             position: relative;
             overflow: hidden;
         }
-        .img-wrapper:last-child { border-bottom: none; }
+        .img-wrapper:first-child { border-bottom: 1px solid #f1f5f9; }
         
+        /* --- 핵심 수정: 사진이 잘리지 않게 설정 --- */
         .method-img { 
-            width: 100%; /* 좌우 꽉 채우기 */
+            width: 100%; 
             height: 100%;
-            object-fit: cover; /* 이미지가 영역을 가득 채우도록 설정 (중요) */
+            /* cover에서 contain으로 변경: 비율 유지하며 전체 다 보여줌 */
+            object-fit: contain; 
         }
 
         .img-label {
             position: absolute;
             top: 10px;
             left: 10px;
-            background: rgba(37, 99, 235, 0.8); /* 브랜드 컬러 적용 */
+            background: rgba(37, 99, 235, 0.8);
             color: white;
             font-size: 11px;
             padding: 3px 8px;
             border-radius: 4px;
             font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .btn-calc { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 8px; }
 
-        /* 결과 창 스타일 */
         .result-box { margin-top: 15px; background: #eff6ff; border-radius: 10px; padding: 15px; border: 1px solid #bfdbfe; display: none; }
         .result-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; border-bottom: 1px dashed #dbeafe; padding-bottom: 6px; }
         .final-sq { text-align: center; font-size: 2.2rem; font-weight: 900; color: #dc2626; margin-top: 5px; }
 
-        /* 모달 팝업 */
         #modal { display: none; position: fixed; z-index: 1000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); justify-content: center; align-items: center; }
-        #modal img { max-width: 100%; max-height: 95%; }
+        #modal img { max-width: 100%; max-height: 95%; object-fit: contain; }
     </style>
 </head>
 <body>
