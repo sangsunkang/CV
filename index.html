@@ -3,105 +3,186 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>전기계산기 Pro - Dark Edition</title>
+    <title>전기계산기 Pro - Premium UI</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
     <style>
-        /* 다크 모드 전용 색상 테마 */
-        :root { 
-            --primary: #3b82f6; 
-            --bg: #0f172a;           /* 가장 바깥 배경 (심해색) */
-            --container-bg: #1e293b; /* 계산기 본체 배경 (진회색) */
-            --input-bg: #334155;     /* 입력창 배경 */
-            --border: #475569; 
-            --text: #f8fafc;         /* 기본 글자색 (화이트) */
-            --text-dim: #94a3b8;     /* 보조 글자색 (그레이) */
+        :root {
+            --primary: #3b82f6;
+            --primary-glow: rgba(59, 130, 246, 0.5);
+            --accent: #60a5fa;
+            --bg-dark: #020617;
+            --card-bg: #0f172a;
+            --input-bg: #1e293b;
+            --border: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --danger: #ef4444;
         }
 
-        body { font-family: 'Pretendard', sans-serif; background: var(--bg); margin: 0; padding: 10px; display: flex; justify-content: center; color: var(--text); }
-        
-        .container { background: var(--container-bg); width: 100%; max-width: 400px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); overflow: hidden; }
-        
-        .header { background: var(--primary); color: white; padding: 14px; text-align: center; }
-        .header h2 { margin: 0; font-size: 1.1rem; letter-spacing: -0.5px; }
-        .header p { margin: 2px 0 0; opacity: 0.8; font-size: 0.75rem; }
+        body {
+            font-family: 'Pretendard', -apple-system, sans-serif;
+            background-color: var(--bg-dark);
+            background-image: radial-gradient(circle at top right, #1e1b4b, transparent),
+                              radial-gradient(circle at bottom left, #0f172a, transparent);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px 10px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
 
-        .content { padding: 15px; }
+        .container {
+            width: 100%;
+            max-width: 420px;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+        }
 
-        .input-group { margin-bottom: 15px; }
-        label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--text-dim); }
+        /* 헤더 스타일링 */
+        .header {
+            padding: 24px 20px;
+            text-align: center;
+            background: linear-gradient(to bottom, rgba(59, 130, 246, 0.1), transparent);
+            border-bottom: 1px solid var(--border);
+        }
+        .header h2 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 800;
+            background: linear-gradient(to right, #60a5fa, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .header p {
+            margin: 6px 0 0;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .content { padding: 20px; }
+
+        /* 입력 섹션 카드화 */
+        .section-card {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .input-group { margin-bottom: 16px; }
+        .input-group:last-child { margin-bottom: 0; }
         
-        /* 입력창 및 선택창 다크 스타일 */
-        select, input { 
-            width: 100%; padding: 12px; 
-            border: 1px solid var(--border); 
-            border-radius: 8px; font-size: 14px; 
-            box-sizing: border-box; 
-            background: var(--input-bg); 
-            color: var(--text); 
+        label {
+            display: flex;
+            align-items: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 12px 14px;
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+        }
+        select:focus, input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-glow);
             outline: none;
         }
-        select:focus, input:focus { border-color: var(--primary); }
-        
-        .row { display: flex; gap: 10px; }
-        .col-7 { flex: 0 0 65%; }
-        .col-3 { flex: 0 0 31%; }
 
-        /* 와이드 이미지 영역 */
-        .method-visual-container { 
-            margin-left: -15px; 
-            margin-right: -15px; 
-            width: calc(100% + 30px); 
-            margin-top: 10px;
-            margin-bottom: 15px;
-            display: none; 
+        .row { display: flex; gap: 12px; }
+        .col-7 { flex: 0 0 60%; }
+        .col-3 { flex: 1; }
+
+        /* 이미지 영역 프리미엄화 */
+        .visual-box {
+            margin: 10px -16px -16px -16px;
             border-top: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
-            background: #000; /* 이미지 배경은 검정으로 */
+            background: #000;
+            display: none;
         }
-        .method-visual-container.active { display: block; }
+        .visual-box.active { display: block; }
 
-        .img-wrapper { 
-            height: 200px; 
+        .img-wrap {
+            height: 180px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: zoom-in;
             position: relative;
-            overflow: hidden;
         }
-        .img-wrapper:first-child { border-bottom: 1px solid var(--border); }
+        .img-wrap:first-child { border-bottom: 1px solid #1e293b; }
         .method-img { width: 100%; height: 100%; object-fit: contain; }
 
-        .img-label {
-            position: absolute; top: 10px; left: 10px;
-            background: var(--primary); color: white;
-            font-size: 10px; padding: 3px 8px; border-radius: 4px; font-weight: bold;
+        .badge {
+            position: absolute; top: 12px; left: 12px;
+            background: rgba(59, 130, 246, 0.9);
+            color: white; font-size: 10px; font-weight: bold;
+            padding: 4px 8px; border-radius: 6px;
+            backdrop-filter: blur(4px);
         }
 
-        .btn-calc { 
-            width: 100%; padding: 16px; 
-            background: var(--primary); color: white; 
-            border: none; border-radius: 10px; 
-            font-size: 16px; font-weight: 700; 
-            cursor: pointer; margin-top: 10px;
-            transition: opacity 0.2s;
+        /* 버튼 애니메이션 */
+        .btn-calc {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 1rem;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 10px 20px -10px var(--primary-glow);
+            transition: all 0.3s ease;
         }
-        .btn-calc:active { opacity: 0.8; }
+        .btn-calc:hover { transform: translateY(-2px); box-shadow: 0 15px 30px -10px var(--primary-glow); }
+        .btn-calc:active { transform: translateY(0); }
 
-        /* 결과창 다크 모드 최적화 */
-        .result-box { 
-            margin-top: 20px; 
-            background: #1e293b; 
-            border-radius: 12px; padding: 18px; 
-            border: 1px solid var(--primary); 
-            display: none; 
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+        /* 결과 화면 디자인 (대시보드 느낌) */
+        .result-dashboard {
+            margin-top: 24px;
+            padding: 20px;
+            background: linear-gradient(145deg, #1e293b, #0f172a);
+            border-radius: 20px;
+            border: 1px solid var(--primary);
+            display: none;
+            animation: fadeIn 0.4s ease-out;
         }
-        .result-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
-        .result-row:last-child { border-bottom: none; }
-        .final-sq { text-align: center; font-size: 2.5rem; font-weight: 900; color: #f87171; margin: 10px 0; text-shadow: 0 0 10px rgba(248,113,113,0.3); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+        .stat-item { padding: 12px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
+        .stat-label { font-size: 0.7rem; color: var(--text-muted); margin-bottom: 4px; display: block; }
+        .stat-value { font-size: 1.1rem; font-weight: 700; color: var(--text-main); }
+
+        .hero-result {
+            text-align: center;
+            padding-top: 15px;
+            border-top: 1px solid var(--border);
+        }
+        .hero-label { font-size: 0.8rem; color: var(--accent); font-weight: bold; }
+        .hero-sq { font-size: 3rem; font-weight: 900; color: #f87171; margin: 5px 0; letter-spacing: -1px; text-shadow: 0 0 20px rgba(248,113,113,0.4); }
 
         /* 모달 팝업 */
-        #modal { display: none; position: fixed; z-index: 1000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); justify-content: center; align-items: center; }
+        #modal { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); justify-content: center; align-items: center; }
         #modal img { max-width: 100%; max-height: 90%; object-fit: contain; }
     </style>
 </head>
@@ -109,68 +190,89 @@
 
 <div class="container">
     <div class="header">
-        <h2>⚡ 전기계산기 Pro</h2>
-        <p>현장 맞춤형 전선 규격 산정</p>
+        <h2>Premium Electric Pro</h2>
+        <p>KEC Standards Compliant • v1.5</p>
     </div>
     
     <div class="content">
-        <div class="input-group">
-            <label>📌 공사 방법</label>
-            <select id="method" onchange="updateView()">
-                <option value="B1" selected>B1 (매입 배관)</option>
-                <option value="A1">A1 (천장내 은폐)</option>
-                <option value="C">C (트레이 / 노출)</option>
-                <option value="E">E (공중 포설)</option>
-            </select>
-
-            <div id="group-B1" class="method-visual-container active">
-                <div class="img-wrapper" onclick="openModal('b1_1.png')"><img src="b1_1.png" class="method-img"><span class="img-label">표준 도해</span></div>
-                <div class="img-wrapper" onclick="openModal('b1_2.png')"><img src="b1_2.png" class="method-img"><span class="img-label">현장 이미지</span></div>
-            </div>
-            <div id="group-A1" class="method-visual-container">
-                <div class="img-wrapper" onclick="openModal('a1_1.png')"><img src="a1_1.png" class="method-img"></div>
-                <div class="img-wrapper" onclick="openModal('a1_2.png')"><img src="a1_2.png" class="method-img"></div>
-            </div>
-            <div id="group-C" class="method-visual-container">
-                <div class="img-wrapper" onclick="openModal('c_1.png')"><img src="c_1.png" class="method-img"></div>
-                <div class="img-wrapper" onclick="openModal('c_2.png')"><img src="c_2.png" class="method-img"></div>
-            </div>
-            <div id="group-E" class="method-visual-container">
-                <div class="img-wrapper" onclick="openModal('e_1.png')"><img src="e_1.png" class="method-img"></div>
-                <div class="img-wrapper" onclick="openModal('e_2.png')"><img src="e_2.png" class="method-img"></div>
+        <div class="section-card">
+            <div class="input-group">
+                <label>📍 Installation Method</label>
+                <select id="method" onchange="updateView()">
+                    <option value="B1" selected>B1 (Conduit in Wall)</option>
+                    <option value="A1">A1 (Conduit in Insulated Wall)</option>
+                    <option value="C">C (Surface Mount / Tray)</option>
+                    <option value="E">E (Free Air / Ladder)</option>
+                </select>
+                <div id="group-B1" class="visual-box active">
+                    <div class="img-wrap" onclick="openModal('b1_1.png')"><img src="b1_1.png" class="method-img"><span class="badge">DIAGRAM</span></div>
+                    <div class="img-wrap" onclick="openModal('b1_2.png')"><img src="b1_2.png" class="method-img"><span class="badge">SITE</span></div>
+                </div>
+                <div id="group-A1" class="visual-box">
+                    <div class="img-wrap" onclick="openModal('a1_1.png')"><img src="a1_1.png" class="method-img"><span class="badge">DIAGRAM</span></div>
+                    <div class="img-wrap" onclick="openModal('a1_2.png')"><img src="a1_2.png" class="method-img"><span class="badge">SITE</span></div>
+                </div>
+                <div id="group-C" class="visual-box">
+                    <div class="img-wrap" onclick="openModal('c_1.png')"><img src="c_1.png" class="method-img"></div>
+                    <div class="img-wrap" onclick="openModal('c_2.png')"><img src="c_2.png" class="method-img"></div>
+                </div>
+                <div id="group-E" class="visual-box">
+                    <div class="img-wrap" onclick="openModal('e_1.png')"><img src="e_1.png" class="method-img"></div>
+                    <div class="img-wrap" onclick="openModal('e_2.png')"><img src="e_2.png" class="method-img"></div>
+                </div>
             </div>
         </div>
 
-        <div class="input-group">
-            <label>🌡️ 주위 온도</label>
-            <select id="temp">
-                <option value="1.00">30℃</option>
-                <option value="0.96">35℃</option>
-                <option value="0.91" selected>40℃</option>
-                <option value="0.87">45℃</option>
-                <option value="0.82">50℃</option>
-            </select>
+        <div class="section-card">
+            <div class="row">
+                <div class="col-7">
+                    <label>🌡️ Temp Condition</label>
+                    <select id="temp">
+                        <option value="1.00">30℃ 환경</option>
+                        <option value="0.91" selected>40℃ 환경</option>
+                        <option value="0.82">50℃ 환경</option>
+                    </select>
+                </div>
+                <div class="col-3">
+                    <label>⚡ Voltage</label>
+                    <select id="voltage">
+                        <option value="380">380V</option>
+                        <option value="220">220V</option>
+                    </select>
+                </div>
+            </div>
         </div>
 
-        <div class="row input-group">
-            <div class="col-7"><label>부하 용량 (kW)</label><input type="number" id="power" value="30"></div>
-            <div class="col-3"><label>역률</label><input type="number" id="pf" value="0.85" step="0.01"></div>
-        </div>
-        
-        <div class="input-group">
-            <label>전압 및 방식</label>
-            <select id="voltage"><option value="380">3상 380V</option><option value="220">단상 220V</option></select>
+        <div class="section-card">
+            <div class="row">
+                <div class="col-7">
+                    <label>Load Power (kW)</label>
+                    <input type="number" id="power" value="30">
+                </div>
+                <div class="col-3">
+                    <label>Cosφ</label>
+                    <input type="number" id="pf" value="0.85" step="0.01">
+                </div>
+            </div>
         </div>
 
-        <button class="btn-calc" onclick="calculate()">규격 산출하기</button>
+        <button class="btn-calc" onclick="calculate()">RUN CALCULATION</button>
 
-        <div id="result" class="result-box">
-            <div class="result-row"><span style="color:var(--text-dim);">설계전류 ($I_B$)</span><span id="resIb"></span></div>
-            <div class="result-row"><span style="color:var(--text-dim);">차단기 정격 ($I_n$)</span><span id="resIn" style="color:var(--primary); font-weight:bold;"></span></div>
-            <div class="result-row"><span style="color:var(--text-dim);">보정 허용전류 ($I_z$)</span><span id="resIz"></span></div>
-            <div class="final-result">
-                <p style="margin:0; font-size:13px; color:var(--text-dim);">추천 CV 케이블 굵기</p>
-                <div class="final-sq" id="resSq"></div>
+        <div id="result" class="result-dashboard">
+            <div class="stat-grid">
+                <div class="stat-item">
+                    <span class="stat-label">Design Current ($I_B$)</span>
+                    <span class="stat-value" id="resIb">0.0 A</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Breaker Rating ($I_n$)</span>
+                    <span class="stat-value" id="resIn" style="color:var(--primary);">0 A</span>
+                </div>
+            </div>
+            <div class="hero-result">
+                <span class="hero-label">RECOMMENDED CV SIZE</span>
+                <div class="hero-sq" id="resSq">-- SQ</div>
+                <p style="margin:0; font-size:0.7rem; color:var(--text-muted);">Iz: <span id="resIz">0.0</span>A 기준 선정</p>
             </div>
         </div>
     </div>
@@ -181,7 +283,7 @@
 <script>
 function updateView() {
     const val = document.getElementById('method').value;
-    document.querySelectorAll('.method-visual-container').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.visual-box').forEach(el => el.classList.remove('active'));
     document.getElementById('group-' + val).classList.add('active');
 }
 
@@ -208,9 +310,9 @@ function calculate() {
     const kt = parseFloat(document.getElementById('temp').value);
     
     let ib = (V === 380) ? (P * 1000) / (Math.sqrt(3) * V * pf) : (P * 1000) / (V * pf);
-    let in_rating = mccb.find(r => r >= ib) || "별도산정";
+    let in_rating = mccb.find(r => r >= ib) || "N/A";
     
-    let selectedSq = "규격초과";
+    let selectedSq = "EXCESS";
     let finalIz = 0;
     const currentTable = cableData[method];
     for (const [sq, amp] of Object.entries(currentTable)) {
@@ -224,7 +326,7 @@ function calculate() {
 
     document.getElementById('resIb').innerText = ib.toFixed(1) + " A";
     document.getElementById('resIn').innerText = in_rating + " A";
-    document.getElementById('resIz').innerText = finalIz.toFixed(1) + " A";
+    document.getElementById('resIz').innerText = finalIz.toFixed(1);
     document.getElementById('resSq').innerText = selectedSq;
     document.getElementById('result').style.display = 'block';
 }
