@@ -3,49 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>전기계산기 Pro - Dark Edition</title>
+    <title>전기계산기 Pro - KEC 통합본</title>
     <style>
-        /* 다크 모드 전용 색상 테마 */
-        :root { 
-            --primary: #3b82f6; 
-            --bg: #0f172a;           /* 가장 바깥 배경 (심해색) */
-            --container-bg: #1e293b; /* 계산기 본체 배경 (진회색) */
-            --input-bg: #334155;     /* 입력창 배경 */
-            --border: #475569; 
-            --text: #f8fafc;         /* 기본 글자색 (화이트) */
-            --text-dim: #94a3b8;     /* 보조 글자색 (그레이) */
-        }
-
+        :root { --primary: #2563eb; --bg: #f8fafc; --border: #e2e8f0; --text: #1e293b; }
         body { font-family: 'Pretendard', sans-serif; background: var(--bg); margin: 0; padding: 10px; display: flex; justify-content: center; color: var(--text); }
         
-        .container { background: var(--container-bg); width: 100%; max-width: 400px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); overflow: hidden; }
+        /* 컨테이너 설정 */
+        .container { background: white; width: 100%; max-width: 400px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); overflow: hidden; }
         
-        .header { background: var(--primary); color: white; padding: 14px; text-align: center; }
+        /* 헤더 스타일 */
+        .header { background: var(--primary); color: white; padding: 12px; text-align: center; }
         .header h2 { margin: 0; font-size: 1.1rem; letter-spacing: -0.5px; }
         .header p { margin: 2px 0 0; opacity: 0.8; font-size: 0.75rem; }
 
         .content { padding: 15px; }
 
-        .input-group { margin-bottom: 15px; }
-        label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--text-dim); }
+        /* 입력 그룹 */
+        .input-group { margin-bottom: 12px; }
+        label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px; color: #475569; }
+        select, input { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; box-sizing: border-box; background: #fff; }
         
-        /* 입력창 및 선택창 다크 스타일 */
-        select, input { 
-            width: 100%; padding: 12px; 
-            border: 1px solid var(--border); 
-            border-radius: 8px; font-size: 14px; 
-            box-sizing: border-box; 
-            background: var(--input-bg); 
-            color: var(--text); 
-            outline: none;
-        }
-        select:focus, input:focus { border-color: var(--primary); }
-        
-        .row { display: flex; gap: 10px; }
+        .row { display: flex; gap: 8px; }
         .col-7 { flex: 0 0 65%; }
-        .col-3 { flex: 0 0 31%; }
+        .col-3 { flex: 0 0 32%; }
 
-        /* 와이드 이미지 영역 */
+        /* 와이드 이미지 영역 (Edge-to-Edge) */
         .method-visual-container { 
             margin-left: -15px; 
             margin-right: -15px; 
@@ -55,11 +37,11 @@
             display: none; 
             border-top: 1px solid var(--border);
             border-bottom: 1px solid var(--border);
-            background: #000; /* 이미지 배경은 검정으로 */
         }
         .method-visual-container.active { display: block; }
 
         .img-wrapper { 
+            background: #ffffff; 
             height: 200px; 
             display: flex;
             align-items: center;
@@ -68,39 +50,24 @@
             position: relative;
             overflow: hidden;
         }
-        .img-wrapper:first-child { border-bottom: 1px solid var(--border); }
-        .method-img { width: 100%; height: 100%; object-fit: contain; }
+        .img-wrapper:first-child { border-bottom: 1px solid #f1f5f9; }
+        
+        .method-img { width: 100%; height: 100%; object-fit: contain; } /* 사진 안 잘리게 설정 */
 
         .img-label {
             position: absolute; top: 10px; left: 10px;
-            background: var(--primary); color: white;
+            background: rgba(37, 99, 235, 0.85); color: white;
             font-size: 10px; padding: 3px 8px; border-radius: 4px; font-weight: bold;
         }
 
-        .btn-calc { 
-            width: 100%; padding: 16px; 
-            background: var(--primary); color: white; 
-            border: none; border-radius: 10px; 
-            font-size: 16px; font-weight: 700; 
-            cursor: pointer; margin-top: 10px;
-            transition: opacity 0.2s;
-        }
-        .btn-calc:active { opacity: 0.8; }
+        /* 버튼 및 결과 */
+        .btn-calc { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 8px; }
+        .result-box { margin-top: 15px; background: #eff6ff; border-radius: 10px; padding: 15px; border: 1px solid #bfdbfe; display: none; }
+        .result-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; border-bottom: 1px dashed #dbeafe; padding-bottom: 6px; }
+        .final-result { text-align: center; margin-top: 10px; }
+        .final-sq { font-size: 2.3rem; font-weight: 900; color: #dc2626; margin: 5px 0; }
 
-        /* 결과창 다크 모드 최적화 */
-        .result-box { 
-            margin-top: 20px; 
-            background: #1e293b; 
-            border-radius: 12px; padding: 18px; 
-            border: 1px solid var(--primary); 
-            display: none; 
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
-        }
-        .result-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
-        .result-row:last-child { border-bottom: none; }
-        .final-sq { text-align: center; font-size: 2.5rem; font-weight: 900; color: #f87171; margin: 10px 0; text-shadow: 0 0 10px rgba(248,113,113,0.3); }
-
-        /* 모달 팝업 */
+        /* 팝업 모달 */
         #modal { display: none; position: fixed; z-index: 1000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); justify-content: center; align-items: center; }
         #modal img { max-width: 100%; max-height: 90%; object-fit: contain; }
     </style>
@@ -110,17 +77,17 @@
 <div class="container">
     <div class="header">
         <h2>⚡ 전기계산기 Pro</h2>
-        <p>현장 맞춤형 전선 규격 산정</p>
+        <p>KEC & 주위온도 보정 반영</p>
     </div>
     
     <div class="content">
         <div class="input-group">
-            <label>📌 공사 방법</label>
+            <label>📌 공사 방법 및 다이어그램</label>
             <select id="method" onchange="updateView()">
-                <option value="B1" selected>B1 (매입 배관)</option>
-                <option value="A1">A1 (천장내 은폐)</option>
-                <option value="C">C (트레이 / 노출)</option>
-                <option value="E">E (공중 포설)</option>
+                <option value="B1" selected>B1 (매입 배관, 벽면 부착)</option>
+                <option value="A1">A1 (천장내 은폐, 단열벽)</option>
+                <option value="C">C (노출 케이블, 트레이)</option>
+                <option value="E">E (공중 포설, 사다리 트레이)</option>
             </select>
 
             <div id="group-B1" class="method-visual-container active">
@@ -128,27 +95,27 @@
                 <div class="img-wrapper" onclick="openModal('b1_2.png')"><img src="b1_2.png" class="method-img"><span class="img-label">현장 이미지</span></div>
             </div>
             <div id="group-A1" class="method-visual-container">
-                <div class="img-wrapper" onclick="openModal('a1_1.png')"><img src="a1_1.png" class="method-img"></div>
-                <div class="img-wrapper" onclick="openModal('a1_2.png')"><img src="a1_2.png" class="method-img"></div>
+                <div class="img-wrapper" onclick="openModal('a1_1.png')"><img src="a1_1.png" class="method-img"><span class="img-label">표준 도해</span></div>
+                <div class="img-wrapper" onclick="openModal('a1_2.png')"><img src="a1_2.png" class="method-img"><span class="img-label">현장 이미지</span></div>
             </div>
             <div id="group-C" class="method-visual-container">
-                <div class="img-wrapper" onclick="openModal('c_1.png')"><img src="c_1.png" class="method-img"></div>
-                <div class="img-wrapper" onclick="openModal('c_2.png')"><img src="c_2.png" class="method-img"></div>
+                <div class="img-wrapper" onclick="openModal('c_1.png')"><img src="c_1.png" class="method-img"><span class="img-label">표준 도해</span></div>
+                <div class="img-wrapper" onclick="openModal('c_2.png')"><img src="c_2.png" class="method-img"><span class="img-label">현장 이미지</span></div>
             </div>
             <div id="group-E" class="method-visual-container">
-                <div class="img-wrapper" onclick="openModal('e_1.png')"><img src="e_1.png" class="method-img"></div>
-                <div class="img-wrapper" onclick="openModal('e_2.png')"><img src="e_2.png" class="method-img"></div>
+                <div class="img-wrapper" onclick="openModal('e_1.png')"><img src="e_1.png" class="method-img"><span class="img-label">표준 도해</span></div>
+                <div class="img-wrapper" onclick="openModal('e_2.png')"><img src="e_2.png" class="method-img"><span class="img-label">현장 이미지</span></div>
             </div>
         </div>
 
         <div class="input-group">
-            <label>🌡️ 주위 온도</label>
+            <label>🌡️ 주위 온도 환경 ($30^\circ\text{C}$ 기준 보정)</label>
             <select id="temp">
-                <option value="1.00">30℃</option>
-                <option value="0.96">35℃</option>
-                <option value="0.91" selected>40℃</option>
-                <option value="0.87">45℃</option>
-                <option value="0.82">50℃</option>
+                <option value="1.00">30℃ 이하 ($k_t$: 1.00)</option>
+                <option value="0.96">35℃ 환경 ($k_t$: 0.96)</option>
+                <option value="0.91" selected>40℃ 환경 ($k_t$: 0.91)</option>
+                <option value="0.87">45℃ 환경 ($k_t$: 0.87)</option>
+                <option value="0.82">50℃ 환경 ($k_t$: 0.82)</option>
             </select>
         </div>
 
@@ -162,14 +129,14 @@
             <select id="voltage"><option value="380">3상 380V</option><option value="220">단상 220V</option></select>
         </div>
 
-        <button class="btn-calc" onclick="calculate()">규격 산출하기</button>
+        <button class="btn-calc" onclick="calculate()">최적 규격 산출하기</button>
 
         <div id="result" class="result-box">
-            <div class="result-row"><span style="color:var(--text-dim);">설계전류 ($I_B$)</span><span id="resIb"></span></div>
-            <div class="result-row"><span style="color:var(--text-dim);">차단기 정격 ($I_n$)</span><span id="resIn" style="color:var(--primary); font-weight:bold;"></span></div>
-            <div class="result-row"><span style="color:var(--text-dim);">보정 허용전류 ($I_z$)</span><span id="resIz"></span></div>
+            <div class="result-row"><span>설계전류 ($I_B$)</span><span id="resIb"></span></div>
+            <div class="result-row"><span>차단기 정격 ($I_n$)</span><span id="resIn" style="color:var(--primary); font-weight:bold;"></span></div>
+            <div class="result-row"><span>보정 허용전류 ($I_z$)</span><span id="resIz"></span></div>
             <div class="final-result">
-                <p style="margin:0; font-size:13px; color:var(--text-dim);">추천 CV 케이블 굵기</p>
+                <p style="margin:0; font-size:13px; color:#64748b;">추천 CV 케이블 굵기</p>
                 <div class="final-sq" id="resSq"></div>
             </div>
         </div>
@@ -192,29 +159,34 @@ function openModal(src) {
 }
 function closeModal() { document.getElementById('modal').style.display = 'none'; }
 
+// KEC 허용전류 데이터 (CV 3심 기준)
 const cableData = {
     "A1": { 2.5: 21, 4: 28, 6: 36, 10: 49, 16: 66, 25: 86, 35: 103, 50: 125, 70: 151 },
     "B1": { 2.5: 26, 4: 35, 6: 45, 10: 61, 16: 82, 25: 108, 35: 135, 50: 168, 70: 207 },
     "C":  { 2.5: 31, 4: 41, 6: 53, 10: 74, 16: 99, 25: 131, 35: 162, 50: 197, 70: 246 },
     "E":  { 2.5: 33, 4: 43, 6: 56, 10: 77, 16: 104, 25: 138, 35: 171, 50: 209, 70: 262 }
 };
-const mccb = [15, 20, 30, 40, 50, 60, 75, 100, 125, 150, 175, 200, 225, 250, 400];
+const mccb = [15, 20, 30, 40, 50, 60, 75, 100, 125, 150, 175, 200, 225, 250, 300, 400];
 
 function calculate() {
     const method = document.getElementById('method').value;
     const P = parseFloat(document.getElementById('power').value);
     const V = parseInt(document.getElementById('voltage').value);
     const pf = parseFloat(document.getElementById('pf').value);
-    const kt = parseFloat(document.getElementById('temp').value);
+    const kt = parseFloat(document.getElementById('temp').value); // 온도 보정 계수
     
+    // 1. Ib 계산
     let ib = (V === 380) ? (P * 1000) / (Math.sqrt(3) * V * pf) : (P * 1000) / (V * pf);
+    
+    // 2. In 선정 (Ib <= In)
     let in_rating = mccb.find(r => r >= ib) || "별도산정";
     
+    // 3. Iz 확인 및 케이블 선정 (In <= Iz)
     let selectedSq = "규격초과";
     let finalIz = 0;
     const currentTable = cableData[method];
     for (const [sq, amp] of Object.entries(currentTable)) {
-        let iz = amp * kt;
+        let iz = amp * kt; // 온도 보정 적용
         if (iz >= in_rating) {
             selectedSq = sq + " SQ";
             finalIz = iz;
