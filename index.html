@@ -3,26 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>전기계산기 Pro - UI 최적화</title>
+    <title>전기계산기 Pro - Dark Edition</title>
     <style>
-        :root { --primary: #2563eb; --bg: #f8fafc; --border: #e2e8f0; --text: #1e293b; }
+        /* 다크 모드 전용 색상 테마 */
+        :root { 
+            --primary: #3b82f6; 
+            --bg: #0f172a;           /* 가장 바깥 배경 (심해색) */
+            --container-bg: #1e293b; /* 계산기 본체 배경 (진회색) */
+            --input-bg: #334155;     /* 입력창 배경 */
+            --border: #475569; 
+            --text: #f8fafc;         /* 기본 글자색 (화이트) */
+            --text-dim: #94a3b8;     /* 보조 글자색 (그레이) */
+        }
+
         body { font-family: 'Pretendard', sans-serif; background: var(--bg); margin: 0; padding: 10px; display: flex; justify-content: center; color: var(--text); }
         
-        .container { background: white; width: 100%; max-width: 400px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); overflow: hidden; }
+        .container { background: var(--container-bg); width: 100%; max-width: 400px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); overflow: hidden; }
         
-        .header { background: var(--primary); color: white; padding: 12px; text-align: center; }
+        .header { background: var(--primary); color: white; padding: 14px; text-align: center; }
         .header h2 { margin: 0; font-size: 1.1rem; letter-spacing: -0.5px; }
         .header p { margin: 2px 0 0; opacity: 0.8; font-size: 0.75rem; }
 
         .content { padding: 15px; }
 
-        .input-group { margin-bottom: 12px; }
-        label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px; color: #475569; }
-        select, input { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; box-sizing: border-box; background: #fff; }
+        .input-group { margin-bottom: 15px; }
+        label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--text-dim); }
         
-        .row { display: flex; gap: 8px; }
+        /* 입력창 및 선택창 다크 스타일 */
+        select, input { 
+            width: 100%; padding: 12px; 
+            border: 1px solid var(--border); 
+            border-radius: 8px; font-size: 14px; 
+            box-sizing: border-box; 
+            background: var(--input-bg); 
+            color: var(--text); 
+            outline: none;
+        }
+        select:focus, input:focus { border-color: var(--primary); }
+        
+        .row { display: flex; gap: 10px; }
         .col-7 { flex: 0 0 65%; }
-        .col-3 { flex: 0 0 32%; }
+        .col-3 { flex: 0 0 31%; }
 
         /* 와이드 이미지 영역 */
         .method-visual-container { 
@@ -34,11 +55,11 @@
             display: none; 
             border-top: 1px solid var(--border);
             border-bottom: 1px solid var(--border);
+            background: #000; /* 이미지 배경은 검정으로 */
         }
         .method-visual-container.active { display: block; }
 
         .img-wrapper { 
-            background: #ffffff; 
             height: 200px; 
             display: flex;
             align-items: center;
@@ -47,20 +68,39 @@
             position: relative;
             overflow: hidden;
         }
-        .img-wrapper:first-child { border-bottom: 1px solid #f1f5f9; }
+        .img-wrapper:first-child { border-bottom: 1px solid var(--border); }
         .method-img { width: 100%; height: 100%; object-fit: contain; }
 
         .img-label {
             position: absolute; top: 10px; left: 10px;
-            background: rgba(37, 99, 235, 0.85); color: white;
+            background: var(--primary); color: white;
             font-size: 10px; padding: 3px 8px; border-radius: 4px; font-weight: bold;
         }
 
-        .btn-calc { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 8px; }
-        .result-box { margin-top: 15px; background: #eff6ff; border-radius: 10px; padding: 15px; border: 1px solid #bfdbfe; display: none; }
-        .result-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; border-bottom: 1px dashed #dbeafe; padding-bottom: 6px; }
-        .final-sq { text-align: center; font-size: 2.3rem; font-weight: 900; color: #dc2626; margin: 5px 0; }
+        .btn-calc { 
+            width: 100%; padding: 16px; 
+            background: var(--primary); color: white; 
+            border: none; border-radius: 10px; 
+            font-size: 16px; font-weight: 700; 
+            cursor: pointer; margin-top: 10px;
+            transition: opacity 0.2s;
+        }
+        .btn-calc:active { opacity: 0.8; }
 
+        /* 결과창 다크 모드 최적화 */
+        .result-box { 
+            margin-top: 20px; 
+            background: #1e293b; 
+            border-radius: 12px; padding: 18px; 
+            border: 1px solid var(--primary); 
+            display: none; 
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .result-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+        .result-row:last-child { border-bottom: none; }
+        .final-sq { text-align: center; font-size: 2.5rem; font-weight: 900; color: #f87171; margin: 10px 0; text-shadow: 0 0 10px rgba(248,113,113,0.3); }
+
+        /* 모달 팝업 */
         #modal { display: none; position: fixed; z-index: 1000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); justify-content: center; align-items: center; }
         #modal img { max-width: 100%; max-height: 90%; object-fit: contain; }
     </style>
@@ -125,11 +165,11 @@
         <button class="btn-calc" onclick="calculate()">규격 산출하기</button>
 
         <div id="result" class="result-box">
-            <div class="result-row"><span>설계전류 ($I_B$)</span><span id="resIb"></span></div>
-            <div class="result-row"><span>차단기 정격 ($I_n$)</span><span id="resIn" style="color:var(--primary); font-weight:bold;"></span></div>
-            <div class="result-row"><span>보정 허용전류 ($I_z$)</span><span id="resIz"></span></div>
+            <div class="result-row"><span style="color:var(--text-dim);">설계전류 ($I_B$)</span><span id="resIb"></span></div>
+            <div class="result-row"><span style="color:var(--text-dim);">차단기 정격 ($I_n$)</span><span id="resIn" style="color:var(--primary); font-weight:bold;"></span></div>
+            <div class="result-row"><span style="color:var(--text-dim);">보정 허용전류 ($I_z$)</span><span id="resIz"></span></div>
             <div class="final-result">
-                <p style="margin:0; font-size:13px; color:#64748b;">추천 CV 케이블 굵기</p>
+                <p style="margin:0; font-size:13px; color:var(--text-dim);">추천 CV 케이블 굵기</p>
                 <div class="final-sq" id="resSq"></div>
             </div>
         </div>
