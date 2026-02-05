@@ -3,102 +3,231 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>전기계산기 Pro - 케이블 선정</title>
+    <title>전기계산기 Pro - Dark Edition</title>
     <style>
-        :root { --primary: #2563eb; --bg: #f8fafc; }
-        body { font-family: 'Pretendard', sans-serif; background: var(--bg); display: flex; justify-content: center; padding: 20px; }
-        .container { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); width: 100%; max-width: 450px; }
-        h2 { color: var(--primary); text-align: center; margin-bottom: 1.5rem; }
-        .input-group { margin-bottom: 1rem; }
-        label { display: block; font-size: 14px; margin-bottom: 5px; color: #475569; }
-        input, select { width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 10px; }
-        button:hover { background: #1d4ed8; }
-        .result { margin-top: 1.5rem; padding: 1rem; background: #eff6ff; border-radius: 8px; display: none; }
-        .result p { margin: 5px 0; font-size: 15px; }
-        .highlight { color: #2563eb; font-weight: bold; }
+        /* 다크 모드 전용 색상 테마 */
+        :root { 
+            --primary: #3b82f6; 
+            --bg: #0f172a;           /* 가장 바깥 배경 (심해색) */
+            --container-bg: #1e293b; /* 계산기 본체 배경 (진회색) */
+            --input-bg: #334155;     /* 입력창 배경 */
+            --border: #475569; 
+            --text: #f8fafc;         /* 기본 글자색 (화이트) */
+            --text-dim: #94a3b8;     /* 보조 글자색 (그레이) */
+        }
+
+        body { font-family: 'Pretendard', sans-serif; background: var(--bg); margin: 0; padding: 10px; display: flex; justify-content: center; color: var(--text); }
+        
+        .container { background: var(--container-bg); width: 100%; max-width: 400px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); overflow: hidden; }
+        
+        .header { background: var(--primary); color: white; padding: 14px; text-align: center; }
+        .header h2 { margin: 0; font-size: 1.1rem; letter-spacing: -0.5px; }
+        .header p { margin: 2px 0 0; opacity: 0.8; font-size: 0.75rem; }
+
+        .content { padding: 15px; }
+
+        .input-group { margin-bottom: 15px; }
+        label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--text-dim); }
+        
+        /* 입력창 및 선택창 다크 스타일 */
+        select, input { 
+            width: 100%; padding: 12px; 
+            border: 1px solid var(--border); 
+            border-radius: 8px; font-size: 14px; 
+            box-sizing: border-box; 
+            background: var(--input-bg); 
+            color: var(--text); 
+            outline: none;
+        }
+        select:focus, input:focus { border-color: var(--primary); }
+        
+        .row { display: flex; gap: 10px; }
+        .col-7 { flex: 0 0 65%; }
+        .col-3 { flex: 0 0 31%; }
+
+        /* 와이드 이미지 영역 */
+        .method-visual-container { 
+            margin-left: -15px; 
+            margin-right: -15px; 
+            width: calc(100% + 30px); 
+            margin-top: 10px;
+            margin-bottom: 15px;
+            display: none; 
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            background: #000; /* 이미지 배경은 검정으로 */
+        }
+        .method-visual-container.active { display: block; }
+
+        .img-wrapper { 
+            height: 200px; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: zoom-in;
+            position: relative;
+            overflow: hidden;
+        }
+        .img-wrapper:first-child { border-bottom: 1px solid var(--border); }
+        .method-img { width: 100%; height: 100%; object-fit: contain; }
+
+        .img-label {
+            position: absolute; top: 10px; left: 10px;
+            background: var(--primary); color: white;
+            font-size: 10px; padding: 3px 8px; border-radius: 4px; font-weight: bold;
+        }
+
+        .btn-calc { 
+            width: 100%; padding: 16px; 
+            background: var(--primary); color: white; 
+            border: none; border-radius: 10px; 
+            font-size: 16px; font-weight: 700; 
+            cursor: pointer; margin-top: 10px;
+            transition: opacity 0.2s;
+        }
+        .btn-calc:active { opacity: 0.8; }
+
+        /* 결과창 다크 모드 최적화 */
+        .result-box { 
+            margin-top: 20px; 
+            background: #1e293b; 
+            border-radius: 12px; padding: 18px; 
+            border: 1px solid var(--primary); 
+            display: none; 
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .result-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+        .result-row:last-child { border-bottom: none; }
+        .final-sq { text-align: center; font-size: 2.5rem; font-weight: 900; color: #f87171; margin: 10px 0; text-shadow: 0 0 10px rgba(248,113,113,0.3); }
+
+        /* 모달 팝업 */
+        #modal { display: none; position: fixed; z-index: 1000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); justify-content: center; align-items: center; }
+        #modal img { max-width: 100%; max-height: 90%; object-fit: contain; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>⚡ 케이블 규격 계산기</h2>
-    
-    <div class="input-group">
-        <label>부하 용량 (kW)</label>
-        <input type="number" id="power" value="20" step="0.1">
+    <div class="header">
+        <h2>⚡ 전기계산기 Pro</h2>
+        <p>현장 맞춤형 전선 규격 산정</p>
     </div>
     
-    <div class="input-group">
-        <label>전압 (V)</label>
-        <select id="voltage">
-            <option value="380">3상 380V</option>
-            <option value="220">단상 220V</option>
-        </select>
-    </div>
-    
-    <div class="input-group">
-        <label>역률 (cosφ)</label>
-        <input type="number" id="pf" value="0.85" step="0.01">
-    </div>
+    <div class="content">
+        <div class="input-group">
+            <label>📌 공사 방법</label>
+            <select id="method" onchange="updateView()">
+                <option value="B1" selected>B1 (매입 배관)</option>
+                <option value="A1">A1 (천장내 은폐)</option>
+                <option value="C">C (트레이 / 노출)</option>
+                <option value="E">E (공중 포설)</option>
+            </select>
 
-    <div class="input-group">
-        <label>주변 온도 보정 (40℃ 기준)</label>
-        <select id="tempFactor">
-            <option value="0.91">CV 케이블 (0.91)</option>
-            <option value="1.0">상온 (1.0)</option>
-        </select>
-    </div>
+            <div id="group-B1" class="method-visual-container active">
+                <div class="img-wrapper" onclick="openModal('b1_1.png')"><img src="b1_1.png" class="method-img"><span class="img-label">표준 도해</span></div>
+                <div class="img-wrapper" onclick="openModal('b1_2.png')"><img src="b1_2.png" class="method-img"><span class="img-label">현장 이미지</span></div>
+            </div>
+            <div id="group-A1" class="method-visual-container">
+                <div class="img-wrapper" onclick="openModal('a1_1.png')"><img src="a1_1.png" class="method-img"></div>
+                <div class="img-wrapper" onclick="openModal('a1_2.png')"><img src="a1_2.png" class="method-img"></div>
+            </div>
+            <div id="group-C" class="method-visual-container">
+                <div class="img-wrapper" onclick="openModal('c_1.png')"><img src="c_1.png" class="method-img"></div>
+                <div class="img-wrapper" onclick="openModal('c_2.png')"><img src="c_2.png" class="method-img"></div>
+            </div>
+            <div id="group-E" class="method-visual-container">
+                <div class="img-wrapper" onclick="openModal('e_1.png')"><img src="e_1.png" class="method-img"></div>
+                <div class="img-wrapper" onclick="openModal('e_2.png')"><img src="e_2.png" class="method-img"></div>
+            </div>
+        </div>
 
-    <button onclick="calculate()">규격 계산하기</button>
+        <div class="input-group">
+            <label>🌡️ 주위 온도</label>
+            <select id="temp">
+                <option value="1.00">30℃</option>
+                <option value="0.96">35℃</option>
+                <option value="0.91" selected>40℃</option>
+                <option value="0.87">45℃</option>
+                <option value="0.82">50℃</option>
+            </select>
+        </div>
 
-    <div id="result" class="result">
-        <p>설계전류(Ib): <span id="resIb" class="highlight"></span> A</p>
-        <p>추천 차단기(In): <span id="resIn" class="highlight"></span> A</p>
-        <hr>
-        <p>최종 케이블 규격: <span id="resSq" style="font-size: 1.2rem; color: #dc2626; font-weight: 800;"></span></p>
-        <p style="font-size: 12px; color: #64748b; margin-top: 10px;">* KEC 기준 / 공사방법 B1(매입) 기준 예시입니다.</p>
+        <div class="row input-group">
+            <div class="col-7"><label>부하 용량 (kW)</label><input type="number" id="power" value="30"></div>
+            <div class="col-3"><label>역률</label><input type="number" id="pf" value="0.85" step="0.01"></div>
+        </div>
+        
+        <div class="input-group">
+            <label>전압 및 방식</label>
+            <select id="voltage"><option value="380">3상 380V</option><option value="220">단상 220V</option></select>
+        </div>
+
+        <button class="btn-calc" onclick="calculate()">규격 산출하기</button>
+
+        <div id="result" class="result-box">
+            <div class="result-row"><span style="color:var(--text-dim);">설계전류 ($I_B$)</span><span id="resIb"></span></div>
+            <div class="result-row"><span style="color:var(--text-dim);">차단기 정격 ($I_n$)</span><span id="resIn" style="color:var(--primary); font-weight:bold;"></span></div>
+            <div class="result-row"><span style="color:var(--text-dim);">보정 허용전류 ($I_z$)</span><span id="resIz"></span></div>
+            <div class="final-result">
+                <p style="margin:0; font-size:13px; color:var(--text-dim);">추천 CV 케이블 굵기</p>
+                <div class="final-sq" id="resSq"></div>
+            </div>
+        </div>
     </div>
 </div>
 
+<div id="modal" onclick="closeModal()"><img id="modal-img" src=""></div>
+
 <script>
+function updateView() {
+    const val = document.getElementById('method').value;
+    document.querySelectorAll('.method-visual-container').forEach(el => el.classList.remove('active'));
+    document.getElementById('group-' + val).classList.add('active');
+}
+
+function openModal(src) {
+    const modal = document.getElementById('modal');
+    document.getElementById('modal-img').src = src;
+    modal.style.display = 'flex';
+}
+function closeModal() { document.getElementById('modal').style.display = 'none'; }
+
+const cableData = {
+    "A1": { 2.5: 21, 4: 28, 6: 36, 10: 49, 16: 66, 25: 86, 35: 103, 50: 125, 70: 151 },
+    "B1": { 2.5: 26, 4: 35, 6: 45, 10: 61, 16: 82, 25: 108, 35: 135, 50: 168, 70: 207 },
+    "C":  { 2.5: 31, 4: 41, 6: 53, 10: 74, 16: 99, 25: 131, 35: 162, 50: 197, 70: 246 },
+    "E":  { 2.5: 33, 4: 43, 6: 56, 10: 77, 16: 104, 25: 138, 35: 171, 50: 209, 70: 262 }
+};
+const mccb = [15, 20, 30, 40, 50, 60, 75, 100, 125, 150, 175, 200, 225, 250, 400];
+
 function calculate() {
-    const P = document.getElementById('power').value;
-    const V = document.getElementById('voltage').value;
-    const pf = document.getElementById('pf').value;
-    const k = document.getElementById('tempFactor').value;
-
-    // 1. 설계전류 계산
-    let ib = (V == 380) ? (P * 1000) / (Math.sqrt(3) * V * pf) : (P * 1000) / (V * pf);
+    const method = document.getElementById('method').value;
+    const P = parseFloat(document.getElementById('power').value);
+    const V = parseInt(document.getElementById('voltage').value);
+    const pf = parseFloat(document.getElementById('pf').value);
+    const kt = parseFloat(document.getElementById('temp').value);
     
-    // 2. 차단기 정격 선정 (표준 정격 리스트)
-    const mccb = [15, 20, 30, 40, 50, 60, 75, 100, 125, 150, 175, 200, 225, 250];
-    let in_rating = mccb.find(r => r >= ib) || "별도 산정";
-
-    // 3. 케이블 허용전류 데이터 (XLPE 3심 B1 공사기준)
-    const cableTable = [
-        {sq: "2.5", amp: 26}, {sq: "4", amp: 35}, {sq: "6", amp: 45}, 
-        {sq: "10", amp: 61}, {sq: "16", amp: 82}, {sq: "25", amp: 108}, 
-        {sq: "35", amp: 135}, {sq: "50", amp: 168}, {sq: "70", amp: 207}
-    ];
-
-    // 4. 선정 로직 (In <= Iz)
-    let selectedSq = "규격 초과";
-    for (let i = 0; i < cableTable.length; i++) {
-        let iz = cableTable[i].amp * k; // 보정계수 적용
+    let ib = (V === 380) ? (P * 1000) / (Math.sqrt(3) * V * pf) : (P * 1000) / (V * pf);
+    let in_rating = mccb.find(r => r >= ib) || "별도산정";
+    
+    let selectedSq = "규격초과";
+    let finalIz = 0;
+    const currentTable = cableData[method];
+    for (const [sq, amp] of Object.entries(currentTable)) {
+        let iz = amp * kt;
         if (iz >= in_rating) {
-            selectedSq = cableTable[i].sq + " mm²";
+            selectedSq = sq + " SQ";
+            finalIz = iz;
             break;
         }
     }
 
-    // 결과 출력
-    document.getElementById('resIb').innerText = ib.toFixed(2);
-    document.getElementById('resIn').innerText = in_rating;
+    document.getElementById('resIb').innerText = ib.toFixed(1) + " A";
+    document.getElementById('resIn').innerText = in_rating + " A";
+    document.getElementById('resIz').innerText = finalIz.toFixed(1) + " A";
     document.getElementById('resSq').innerText = selectedSq;
     document.getElementById('result').style.display = 'block';
 }
 </script>
-
 </body>
 </html>
